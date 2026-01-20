@@ -5,6 +5,9 @@ import 'dart:convert';
 
 import '../../controller/utils/database_admin.dart';
 import '../../controller/utils/theme/app_theme.dart';
+import '../../controller/utils/settings/app_settings.dart';
+import '../../controller/utils/settings/settings_controller.dart';
+import '../settings/settings_screen.dart';
 
 class DebugScreen extends StatefulWidget {
   const DebugScreen({Key? key}) : super(key: key);
@@ -64,6 +67,8 @@ class _DebugScreenState extends State<DebugScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _buildSettingsSection(),
+                    SizedBox(height: 3.h),
                     _buildDatabaseInfo(),
                     SizedBox(height: 3.h),
                     _buildTableInfo(),
@@ -177,6 +182,72 @@ class _DebugScreenState extends State<DebugScreen> {
                     ],
                   ),
                 )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsSection() {
+    return Container(
+      padding: EdgeInsets.all(5.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryColor.withOpacity(0.1),
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.settings, color: AppTheme.secondaryColor, size: 6.w),
+              SizedBox(width: 2.w),
+              Text(
+                '🎨 App Settings',
+                style: AppTheme.getHeadingStyle(
+                  fontSize: AppTheme.fontSizeXL.sp,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 2.h),
+          Text(
+            'Customize app appearance, colors, fonts, and text',
+            style: AppTheme.getBodyStyle(
+              fontSize: AppTheme.fontSizeSmall.sp,
+              color: AppTheme.textSecondary.withOpacity(0.7),
+            ),
+          ),
+          SizedBox(height: 2.h),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Get.to(() => const SettingsScreen(),
+                    transition: Transition.rightToLeft);
+              },
+              icon: Icon(Icons.palette, size: 5.w),
+              label: Text(
+                'Open Settings',
+                style: AppTheme.getBodyStyle(
+                  fontSize: AppTheme.fontSizeMedium.sp,
+                  color: Colors.white,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.secondaryColor,
+                padding: EdgeInsets.symmetric(vertical: 2.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
