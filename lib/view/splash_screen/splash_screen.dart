@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import '../../controller/utils/settings/settings_controller.dart';
 import '../../controller/utils/theme/app_theme.dart';
 import '../home_screen/home_screen.dart';
+import '../widgets/app_logo_widget.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -59,6 +61,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final settingsController = Get.find<SettingsController>();
+    final settings = settingsController.settings.value;
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -78,27 +82,9 @@ class _SplashScreenState extends State<SplashScreen>
             children: [
               ScaleTransition(
                 scale: _heartScale,
-                child: Container(
-                  width: 25.w,
-                  height: 25.w,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primaryColor.withOpacity(0.3),
-                        blurRadius: 30,
-                        spreadRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/images/ChatGPT Image Jan 20, 2026, 05_09_06 PM.png',
-                      width: 25.w,
-                      height: 25.w,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                child: const AppLogoWidget(
+                  size: 25.0,
+                  showShadow: true,
                 ),
               ),
               SizedBox(height: 5.h),
@@ -107,7 +93,8 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   children: [
                     Text(
-                      'Our Love Story',
+                      settings.appTitle,
+                      // 'Our Love Story',
                       style: AppTheme.getTitleStyle(
                         fontSize: AppTheme.fontSizeDisplay.sp,
                         color: AppTheme.textSecondary,
@@ -115,7 +102,8 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     SizedBox(height: 1.5.h),
                     Text(
-                      'Every moment with you is a treasure',
+                      settings.appSubtitle,
+                      // 'Every moment with you is a treasure',
                       style: AppTheme.getScriptStyle(
                         fontSize: AppTheme.fontSizeXL.sp,
                         color: AppTheme.textSecondary.withOpacity(0.7),

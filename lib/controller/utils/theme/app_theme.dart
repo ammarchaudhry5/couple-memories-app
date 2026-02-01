@@ -1,14 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
+import '../settings/settings_controller.dart';
+import '../settings/app_settings.dart';
 
 class AppTheme {
-  // Colors
-  static const Color primaryColor = Color(0xFFFFB6C1);
-  static const Color secondaryColor = Color(0xFFB76E79);
-  static const Color surfaceColor = Color(0xFFFFF5EE);
-  static const Color accentColor = Color(0xFFE6E6FA);
-  static const Color textPrimary = Color(0xFF2C3E50);
-  static const Color textSecondary = Color(0xFFB76E79);
+  // Get settings controller
+  static SettingsController? get _settingsController {
+    try {
+      return Get.find<SettingsController>();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Get current settings
+  static AppSettings get _settings {
+    final controller = _settingsController;
+    if (controller != null && controller.settings.value != null) {
+      return controller.settings.value;
+    }
+    return _defaultSettings;
+  }
+  
+  static final AppSettings _defaultSettings = AppSettings();
+
+  // Colors - reactive to settings
+  static Color get primaryColor => _settings.selectedPalette.primaryColor;
+  static Color get secondaryColor => _settings.selectedPalette.secondaryColor;
+  static Color get surfaceColor => _settings.selectedPalette.surfaceColor;
+  static Color get accentColor => _settings.selectedPalette.accentColor;
+  static Color get textPrimary => _settings.selectedPalette.textPrimary;
+  static Color get textSecondary => _settings.selectedPalette.textSecondary;
 
   // Font Sizes (Base sizes - will be scaled with responsive_sizer)
   static const double fontSizeSmall = 12.0;
@@ -19,7 +42,7 @@ class AppTheme {
   static const double fontSizeXXL = 24.0;
   static const double fontSizeHeading = 28.0;
   static const double fontSizeTitle = 32.0;
-  static const double fontSizeDisplay = 42.0;
+  static const double fontSizeDisplay = 36.0;
 
   // Spacing
   static const double spacingXS = 4.0;
@@ -37,27 +60,198 @@ class AppTheme {
   static const double radiusXL = 24.0;
   static const double radiusXXXL = 30.0;
 
-  // Text Styles
+  // Helper method to get GoogleFonts by font ID
+  static TextStyle _getFontStyle(String fontId, {
+    required double fontSize,
+    Color? color,
+    FontWeight? fontWeight,
+    double? letterSpacing,
+    double? height,
+  })
+  {
+    switch (fontId) {
+      case 'playfair':
+        return GoogleFonts.playfairDisplay(
+          fontSize: fontSize,
+          fontWeight: fontWeight ?? FontWeight.bold,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'dancing':
+        return GoogleFonts.dancingScript(
+          fontSize: fontSize,
+          fontWeight: fontWeight ?? FontWeight.w500,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'cormorant':
+        return GoogleFonts.cormorantGaramond(
+          fontSize: fontSize,
+          fontWeight: fontWeight ?? FontWeight.bold,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'lora':
+        return GoogleFonts.lora(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'merriweather':
+        return GoogleFonts.merriweather(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'poppins':
+        return GoogleFonts.poppins(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'roboto':
+        return GoogleFonts.roboto(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'montserrat':
+        return GoogleFonts.montserrat(
+          fontSize: fontSize,
+          fontWeight: fontWeight ?? FontWeight.bold,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'raleway':
+        return GoogleFonts.raleway(
+          fontSize: fontSize,
+          fontWeight: fontWeight ?? FontWeight.bold,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'opensans':
+        return GoogleFonts.openSans(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'nunito':
+        return GoogleFonts.nunito(
+          fontSize: fontSize,
+          fontWeight: fontWeight ?? FontWeight.w600,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'inter':
+        return GoogleFonts.inter(
+          fontSize: fontSize,
+          fontWeight: fontWeight ?? FontWeight.w600,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'sourcesans':
+        return GoogleFonts.sourceSans3(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'quicksand':
+        return GoogleFonts.quicksand(
+          fontSize: fontSize,
+          fontWeight: fontWeight ?? FontWeight.w600,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'comfortaa':
+        return GoogleFonts.comfortaa(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'pacifico':
+        return GoogleFonts.pacifico(
+          fontSize: fontSize,
+          fontWeight: FontWeight.normal,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'greatvibes':
+        return GoogleFonts.greatVibes(
+          fontSize: fontSize,
+          fontWeight: FontWeight.normal,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      case 'satisfy':
+        return GoogleFonts.satisfy(
+          fontSize: fontSize,
+          fontWeight: FontWeight.normal,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+      default:
+        return GoogleFonts.poppins(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+          letterSpacing: letterSpacing,
+          height: height,
+        );
+    }
+  }
+
+  // Text Styles - reactive to settings
   static TextStyle getHeadingStyle({Color? color, double? fontSize}) {
-    return GoogleFonts.playfairDisplay(
+    final settings = _settings;
+    return _getFontStyle(
+      settings.selectedFontCombination.headingFont.id,
       fontSize: fontSize ?? fontSizeHeading,
-      fontWeight: FontWeight.bold,
       color: color ?? textSecondary,
+      fontWeight: FontWeight.bold,
       letterSpacing: 0.5,
     );
   }
 
   static TextStyle getTitleStyle({Color? color, double? fontSize}) {
-    return GoogleFonts.playfairDisplay(
+    final settings = _settings;
+    return _getFontStyle(
+      settings.selectedFontCombination.headingFont.id,
       fontSize: fontSize ?? fontSizeTitle,
-      fontWeight: FontWeight.bold,
       color: color ?? textSecondary,
+      fontWeight: FontWeight.bold,
       letterSpacing: 1.0,
     );
   }
 
   static TextStyle getBodyStyle({Color? color, double? fontSize}) {
-    return GoogleFonts.poppins(
+    final settings = _settings;
+    return _getFontStyle(
+      settings.selectedFontCombination.bodyFont.id,
       fontSize: fontSize ?? fontSizeBody,
       color: color ?? textPrimary,
       height: 1.6,
@@ -65,7 +259,9 @@ class AppTheme {
   }
 
   static TextStyle getCaptionStyle({Color? color, double? fontSize}) {
-    return GoogleFonts.poppins(
+    final settings = _settings;
+    return _getFontStyle(
+      settings.selectedFontCombination.bodyFont.id,
       fontSize: fontSize ?? fontSizeSmall,
       color: color ?? textSecondary.withOpacity(0.6),
       fontWeight: FontWeight.w500,
@@ -73,14 +269,16 @@ class AppTheme {
   }
 
   static TextStyle getScriptStyle({Color? color, double? fontSize}) {
-    return GoogleFonts.dancingScript(
+    final settings = _settings;
+    return _getFontStyle(
+      settings.selectedFontCombination.headingFont.id,
       fontSize: fontSize ?? fontSizeLarge,
       color: color ?? textSecondary,
       fontWeight: FontWeight.w500,
     );
   }
 
-  // Gradients
+  // Gradients - reactive to settings
   static LinearGradient get primaryGradient => LinearGradient(
         colors: [primaryColor, secondaryColor],
         begin: Alignment.topLeft,
@@ -109,7 +307,7 @@ class AppTheme {
   static ThemeData get themeData => ThemeData(
         primaryColor: primaryColor,
         scaffoldBackgroundColor: surfaceColor,
-        colorScheme: const ColorScheme.light(
+        colorScheme: ColorScheme.light(
           primary: primaryColor,
           secondary: secondaryColor,
           surface: surfaceColor,

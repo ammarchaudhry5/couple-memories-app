@@ -34,7 +34,6 @@ class MediaGalleryWidget extends StatelessWidget {
 
     return GridView.builder(
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: mediaFiles.length <= 2 ? 2 : 3,
         crossAxisSpacing: 2.w,

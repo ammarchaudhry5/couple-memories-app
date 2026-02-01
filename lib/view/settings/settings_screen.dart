@@ -4,6 +4,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:yaaram/controller/utils/settings/app_settings.dart';
 import 'package:yaaram/controller/utils/settings/settings_controller.dart';
 import '../../controller/utils/theme/app_theme.dart';
+import '../../utils/navigation_helper.dart';
+import '../widgets/color_circle_widget.dart';
+import '../widgets/admin_tile_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -16,7 +19,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final SettingsController _settingsController = Get.put(SettingsController());
   late TextEditingController _appTitleController;
   late TextEditingController _appSubtitleController;
-  late TextEditingController _daysCounterController;
   late TextEditingController _timelineTabController;
   late TextEditingController _galleryTabController;
   late TextEditingController _favoritesTabController;
@@ -24,14 +26,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize with default values first
+    final defaultSettings = _settingsController.settings.value;
+    _appTitleController = TextEditingController(text: defaultSettings.appTitle);
+    _appSubtitleController = TextEditingController(text: defaultSettings.appSubtitle);
+    _timelineTabController = TextEditingController(text: defaultSettings.timelineTab);
+    _galleryTabController = TextEditingController(text: defaultSettings.galleryTab);
+    _favoritesTabController = TextEditingController(text: defaultSettings.favoritesTab);
+    
+    // Load and update if settings are loaded
     _settingsController.loadSettings().then((_) {
       final settings = _settingsController.settings.value;
-      _appTitleController = TextEditingController(text: settings.appTitle);
-      _appSubtitleController = TextEditingController(text: settings.appSubtitle);
-      _daysCounterController = TextEditingController(text: settings.daysCounterText);
-      _timelineTabController = TextEditingController(text: settings.timelineTab);
-      _galleryTabController = TextEditingController(text: settings.galleryTab);
-      _favoritesTabController = TextEditingController(text: settings.favoritesTab);
+      _appTitleController.text = settings.appTitle;
+      _appSubtitleController.text = settings.appSubtitle;
+      _timelineTabController.text = settings.timelineTab;
+      _galleryTabController.text = settings.galleryTab;
+      _favoritesTabController.text = settings.favoritesTab;
     });
   }
 
@@ -39,7 +49,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void dispose() {
     _appTitleController.dispose();
     _appSubtitleController.dispose();
-    _daysCounterController.dispose();
     _timelineTabController.dispose();
     _galleryTabController.dispose();
     _favoritesTabController.dispose();
@@ -50,12 +59,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Get.back(),
+        ),
         title: Text(
           'App Settings',
-          style: AppTheme.getHeadingStyle(fontSize: AppTheme.fontSizeXL.sp),
+          style: AppTheme.getHeadingStyle(
+            fontSize: AppTheme.fontSizeXL.sp,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: AppTheme.secondaryColor,
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -74,9 +91,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 _buildColorPaletteSection(settings.selectedPalette),
                 SizedBox(height: 3.h),
-                _buildFontSection(settings.selectedFont),
+                _buildFontCombinationSection(settings.selectedFontCombination),
                 SizedBox(height: 3.h),
                 _buildTextCustomizationSection(),
+                SizedBox(height: 3.h),
+                _buildAdminSection(),
               ],
             ),
           );
@@ -116,7 +135,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SizedBox(height: 2.h),
           GridView.builder(
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 3.w,
@@ -159,11 +177,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _buildColorCircle(palette.primaryColor),
+                          ColorCircleWidget(color: palette.primaryColor),
                           SizedBox(width: 1.w),
-                          _buildColorCircle(palette.secondaryColor),
+                          ColorCircleWidget(color: palette.secondaryColor),
                           SizedBox(width: 1.w),
-                          _buildColorCircle(palette.accentColor),
+                          ColorCircleWidget(color: palette.accentColor),
                         ],
                       ),
                       SizedBox(height: 1.h),
@@ -196,25 +214,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildColorCircle(Color color) {
-    return Container(
-      width: 8.w,
-      height: 8.w,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildFontSection(FontOption currentFont) {
+  Widget _buildFontCombinationSection(FontCombination currentCombination) {
     return Container(
       padding: EdgeInsets.all(5.w),
       decoration: BoxDecoration(
@@ -231,12 +232,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '✍️ Font Style',
+            '✍️ Font Combination',
             style: AppTheme.getHeadingStyle(fontSize: AppTheme.fontSizeXL.sp),
           ),
           SizedBox(height: 2.h),
           Text(
-            'Select your preferred font family',
+            'Select a font combination (Heading + Body)',
             style: AppTheme.getBodyStyle(
               fontSize: AppTheme.fontSizeSmall.sp,
               color: AppTheme.textSecondary.withOpacity(0.7),
@@ -245,28 +246,65 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SizedBox(height: 2.h),
           ListView.builder(
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: AppSettings.fontOptions.length,
+            itemCount: AppSettings.fontCombinations.length,
             itemBuilder: (context, index) {
-              final font = AppSettings.fontOptions[index];
-              final isSelected = font.id == currentFont.id;
+              final combination = AppSettings.fontCombinations[index];
+              final isSelected = combination.id == currentCombination.id;
 
               return ListTile(
-                title: Text(
-                  font.name,
-                  style: AppTheme.getBodyStyle(
-                    fontSize: AppTheme.fontSizeMedium.sp,
-                  ).copyWith(
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      combination.name,
+                      style: AppTheme.getBodyStyle(
+                        fontSize: AppTheme.fontSizeMedium.sp,
+                      ).copyWith(
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                    SizedBox(height: 0.5.h),
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                          ),
+                          child: Text(
+                            'H: ${combination.headingFont.name}',
+                            style: AppTheme.getCaptionStyle(
+                              fontSize: AppTheme.fontSizeSmall.sp,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 2.w),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
+                          decoration: BoxDecoration(
+                            color: AppTheme.accentColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                          ),
+                          child: Text(
+                            'B: ${combination.bodyFont.name}',
+                            style: AppTheme.getCaptionStyle(
+                              fontSize: AppTheme.fontSizeSmall.sp,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 trailing: isSelected
                     ? Icon(Icons.check, color: AppTheme.secondaryColor)
                     : null,
                 onTap: () {
-                  _settingsController.updateFont(font);
-                  Get.snackbar('Success', 'Font updated!',
-                      snackPosition: SnackPosition.BOTTOM);
+                  _settingsController.updateFontCombination(combination);
+                  Get.snackbar('Success', 'Font combination updated!',
+                      snackPosition: SnackPosition.BOTTOM,
+                      duration: Duration(milliseconds: 800));
                 },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
@@ -311,17 +349,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           SizedBox(height: 2.h),
-          _buildTextField('App Title', _appTitleController, 'appTitle'),
+          _buildTextField('App Title', _appTitleController),
           SizedBox(height: 2.h),
-          _buildTextField('App Subtitle', _appSubtitleController, 'appSubtitle'),
+          _buildTextField('App Subtitle', _appSubtitleController),
           SizedBox(height: 2.h),
-          _buildTextField('Days Counter Text', _daysCounterController, 'daysCounter'),
+          _buildTextField('Timeline Tab', _timelineTabController),
           SizedBox(height: 2.h),
-          _buildTextField('Timeline Tab', _timelineTabController, 'timelineTab'),
+          _buildTextField('Gallery Tab', _galleryTabController),
           SizedBox(height: 2.h),
-          _buildTextField('Gallery Tab', _galleryTabController, 'galleryTab'),
-          SizedBox(height: 2.h),
-          _buildTextField('Favorites Tab', _favoritesTabController, 'favoritesTab'),
+          _buildTextField('Favorites Tab', _favoritesTabController),
           SizedBox(height: 2.h),
           SizedBox(
             width: double.infinity,
@@ -330,7 +366,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _settingsController.updateTextCustomization(
                   appTitle: _appTitleController.text,
                   appSubtitle: _appSubtitleController.text,
-                  daysCounterText: _daysCounterController.text,
                   timelineTab: _timelineTabController.text,
                   galleryTab: _galleryTabController.text,
                   favoritesTab: _favoritesTabController.text,
@@ -359,7 +394,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, String field) {
+  Widget _buildTextField(String label, TextEditingController controller) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
@@ -374,4 +409,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+
+  Widget _buildAdminSection() {
+    return Container(
+      padding: EdgeInsets.all(5.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryColor.withOpacity(0.1),
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.admin_panel_settings, color: AppTheme.secondaryColor, size: 6.w),
+              SizedBox(width: 2.w),
+              Text(
+                '⚙️ Admin',
+                style: AppTheme.getHeadingStyle(fontSize: AppTheme.fontSizeXL.sp),
+              ),
+            ],
+          ),
+          SizedBox(height: 2.h),
+          AdminTileWidget(
+            title: 'Database Admin',
+            icon: Icons.storage,
+            onTap: NavigationHelper.toDatabaseAdmin,
+          ),
+          AdminTileWidget(
+            title: 'Memories Admin',
+            icon: Icons.photo_library,
+            onTap: NavigationHelper.toMemoriesAdmin,
+          ),
+          AdminTileWidget(
+            title: 'Debug Panel',
+            icon: Icons.bug_report,
+            onTap: NavigationHelper.toDebugScreen,
+          ),
+        ],
+      ),
+    );
+  }
+
 }

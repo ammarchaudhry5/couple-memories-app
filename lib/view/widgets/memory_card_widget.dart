@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide DateUtils;
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:yaaram/controller/memory_controller.dart';
 import 'package:yaaram/model/memory_model/memory_model.dart';
 import '../../controller/utils/theme/app_theme.dart';
+import '../../controller/utils/date_utils.dart';
 import '../memory_detail_screen/memory_detail_screen.dart';
 import 'memory_card_media.dart';
 
@@ -66,7 +67,7 @@ class MemoryCardWidget extends StatelessWidget {
                       ),
                       SizedBox(width: 2.w),
                       Text(
-                        '${memory.date.day} ${_getMonthName(memory.date.month)} ${memory.date.year}',
+                        '${memory.date.day} ${DateUtils.getMonthName(memory.date.month)} ${memory.date.year}',
                         style: AppTheme.getCaptionStyle(
                           fontSize: AppTheme.fontSizeSmall.sp,
                           color: AppTheme.textSecondary.withOpacity(0.6),
@@ -126,8 +127,6 @@ class MemoryCardWidget extends StatelessWidget {
                       fontSize: AppTheme.fontSizeBody.sp,
                       color: AppTheme.textPrimary.withOpacity(0.7),
                     ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 1.5.h),
                   Row(
@@ -179,11 +178,4 @@ class MemoryCardWidget extends StatelessWidget {
     );
   }
 
-  String _getMonthName(int month) {
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return months[month - 1];
-  }
 }
